@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Мой профиль</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .profile {
+            width: 600px;
+            max-width: 90%;
+            margin: 80px auto;
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #333;
+        }
+
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: linear-gradient(
+                135deg,
+                #833ab4,
+                #fd1d1d,
+                #fcb045
+            );
+
+            font-size: 42px;
+            font-weight: bold;
+        }
+
+        .info {
+            flex: 1;
+        }
+
+        .name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .username {
+            color: #aaa;
+            font-size: 17px;
+            margin-bottom: 25px;
+        }
+
+        .email {
+            color: #777;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .buttons a {
+            text-decoration: none;
+            color: white;
+            background: #333;
+
+            padding: 10px 22px;
+            border-radius: 8px;
+
+            font-weight: bold;
+        }
+
+        .buttons a:hover {
+            background: #444;
+        }
+
+        .logout {
+            background: #ed4956 !important;
+        }
+
+        .logout:hover {
+            background: #d93644 !important;
+        }
+
+        .posts {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .posts h2 {
+            font-size: 20px;
+        }
+
+        .empty {
+            color: #777;
+            margin-top: 30px;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .profile {
+                margin-top: 40px;
+            }
+
+            .top {
+                flex-direction: column;
+                text-align: center;
+                gap: 25px;
+            }
+
+            .buttons {
+                justify-content: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="profile">
+
+        <div class="top">
+
+            <!-- Аватар из букв -->
+            <div class="avatar">
+                {{ profile.letters }}
+            </div>
+
+
+            <div class="info">
+
+                <!-- Имя -->
+                <div class="name">
+                    {{ profile.name }}
+                </div>
+
+
+                <!-- Username -->
+                <div class="username">
+                    @{{ profile.username }}
+                </div>
+
+
+                <!-- Кнопки -->
+                <div class="buttons">
+
+                    <a href="/logout" class="logout">
+                        Выйти
+                    </a>
+
+                </div>
+
+
+                <!-- Email -->
+                <div class="email">
+                    {{ profile.email }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="posts">
+
+            <h2>Публикации</h2>
+
+            <div class="empty">
+                У вас пока нет публикаций
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

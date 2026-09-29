@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram - Registration</title>
+    <title>Instagram - Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -12,12 +12,6 @@
     <div class="auth">
 
         <div class="logo">Instagram</div>
-
-        <h2>Create an account</h2>
-
-        <p class="text">
-            Sign up to see photos and videos from your friends.
-        </p>
 
         <form method="POST">
 
@@ -35,21 +29,14 @@
                 required
             >
 
-            <input
-                type="password"
-                name="confirm_password"
-                placeholder="Confirm password"
-                required
-            >
-
             <button type="submit">
-                Sign up
+                Log in
             </button>
 
         </form>
 
-        <p class="info">
-            By signing up, you agree to our Terms and Privacy Policy.
+        <p class="forgot">
+            Forgot password?
         </p>
 
     </div>
@@ -58,8 +45,8 @@
     <div class="login-box">
 
         <p>
-            Have an account?
-            <a href="/login">Log in</a>
+            Don't have an account?
+            <a href="/register">Sign up</a>
         </p>
 
     </div>
