@@ -1,1 +1,98 @@
+* {
+    box-sizing: border-box;
+}
 
+body {
+    margin: 0;
+    background: #fafafa;
+    font-family: Arial, sans-serif;
+    color: #262626;
+}
+
+.auth {
+    width: 350px;
+    margin: 50px auto 10px;
+    padding: 35px 40px;
+    background: white;
+    border: 1px solid #dbdbdb;
+    text-align: center;
+}
+
+.logo {
+    font-family: cursive;
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.auth h2 {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.text {
+    font-size: 14px;
+    color: #737373;
+    line-height: 20px;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    background: #fafafa;
+    font-size: 12px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #999;
+}
+
+button {
+    margin-top: 8px;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #0095f6;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1877f2;
+}
+
+.info {
+    margin-top: 25px;
+    font-size: 11px;
+    color: #737373;
+    line-height: 16px;
+}
+
+.login-box {
+    width: 350px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border: 1px solid #dbdbdb;
+    text-align: center;
+    font-size: 14px;
+}
+
+.login-box a {
+    color: #0095f6;
+    text-decoration: none;
+    font-weight: bold;
+}
