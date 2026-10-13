@@ -96,3 +96,30 @@ button:hover {
     text-decoration: none;
     font-weight: bold;
 }
+
+.messages {
+    width: 90%;
+    max-width: 500px;
+    margin: 20px auto;
+}
+
+.alert {
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+}
+
+.alert.success {
+    background: #173d27;
+    color: #7deda4;
+    border: 1px solid #287a45;
+}
+
+.alert.error {
+    background: #451e23;
+    color: #ff9ba5;
+    border: 1px solid #a83240;
+}
