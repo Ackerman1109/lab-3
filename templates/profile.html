@@ -200,7 +200,13 @@
         </div>
 
     </div>
-
+    <div class="messages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+</div>
 </body>
 
 </html>
