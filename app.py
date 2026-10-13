@@ -1,204 +1,183 @@
-from flask import Flask, render_template, request, redirect, url_for, make_response
+
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    make_response,
+    flash
+)
+import sqlite3
 import json
+import os
 
 app = Flask(__name__)
+app.secret_key = "lab4-demo-secret-key"
 
+DATABASE = "users.db"
 USERS_FILE = "users.json"
 
 
-
-def load_users():
-    with open(USERS_FILE, "r") as file:
-        return json.load(file)
-
-
-
-def save_users(users):
-    with open(USERS_FILE, "w") as file:
-        json.dump(users, file, indent=4)
+# Database connection
+def get_db():
+    connection = sqlite3.connect(DATABASE)
+    connection.row_factory = sqlite3.Row
+    return connection
 
 
+# Create database and table
+def init_db():
+    with get_db() as db:
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL
+            )
+        """)
 
-def create_profile(email):
+        # Import existing users from users.json
+        if os.path.exists(USERS_FILE):
+            try:
+                with open(USERS_FILE, "r", encoding="utf-8") as file:
+                    users = json.load(file)
 
-    
-    username = email.split("@")[0]
+                for user in users:
+                    db.execute(
+                        """
+                        INSERT OR IGNORE INTO users (email, password)
+                        VALUES (?, ?)
+                        """,
+                        (user["email"], user["password"])
+                    )
+            except (json.JSONDecodeError, KeyError, TypeError):
+                pass
 
-   
-    name = username.replace(".", " ").replace("_", " ")
 
-   
-    name = name.title()
+init_db()
 
-    
-    letters = ""
 
-    for word in name.split():
-        if word:
-            letters += word[0]
+# Profile page
+@app.route("/")
+def instagram():
+    email = request.cookies.get("email")
 
-  
-    letters = letters[:2].upper()
+    if not email:
+        return redirect(url_for("login"))
 
-   
-    if len(letters) == 1:
-        letters = letters * 2
+    with get_db() as db:
+        user = db.execute(
+            "SELECT id, email FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
 
-    return {
-        "email": email,
-        "username": username,
+    if user is None:
+        response = make_response(redirect(url_for("login")))
+        response.delete_cookie("email")
+        flash("Please log in to continue.", "error")
+        return response
+
+    email = user["email"]
+    name = email.split("@")[0]
+    username = name.lower().replace(" ", "_")
+    letters = name[:2].upper()
+
+    profile = {
         "name": name,
-        "letters": letters
+        "username": username,
+        "letters": letters,
+        "email": email
     }
 
+    return render_template("profile.html", profile=profile)
 
 
-@app.route("/")
-def home():
-
-    email = request.cookies.get("email")
-
-    if not email:
-        return redirect(url_for("login"))
-
-    return redirect(url_for("profile"))
-
-
-
-@app.route("/profile")
-def profile():
-
-    email = request.cookies.get("email")
-
-    
-    if not email:
-        return redirect(url_for("login"))
-
-    
-    profile = create_profile(email)
-
-    return render_template(
-        "profile.html",
-        profile=profile
-    )
-
-
-
+# Registration
 @app.route("/register", methods=["GET", "POST"])
 def register():
-
     if request.method == "POST":
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
 
-        email = request.form.get("email")
-        password = request.form.get("password")
-        confirm_password = request.form.get("confirm_password")
-
-        
         if not email or not password or not confirm_password:
-
-            return render_template(
-                "register.html",
-                error="Please fill in all fields"
-            )
+            flash("Please fill in all fields.", "error")
+            return redirect(url_for("register"))
 
         if len(password) < 6:
-
-            return render_template(
-                "register.html",
-                error="Password must contain at least 6 characters"
+            flash(
+                "Password must contain at least 6 characters.",
+                "error"
             )
+            return redirect(url_for("register"))
 
-        
         if password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return redirect(url_for("register"))
 
-            return render_template(
-                "register.html",
-                error="Passwords do not match"
-            )
-
-     
-        users = load_users()
-
-        for user in users:
-
-            if user["email"] == email:
-
-                return render_template(
-                    "register.html",
-                    error="This email is already registered"
+        try:
+            with get_db() as db:
+                db.execute(
+                    """
+                    INSERT INTO users (email, password)
+                    VALUES (?, ?)
+                    """,
+                    (email, password)
                 )
+        except sqlite3.IntegrityError:
+            flash("This email is already registered.", "error")
+            return redirect(url_for("register"))
 
-      
-        users.append({
-            "email": email,
-            "password": password
-        })
-
-      
-        save_users(users)
-
-     
-        response = make_response(
-            redirect(url_for("profile"))
+        flash(
+            "Registration successful! You can now log in.",
+            "success"
         )
-
-        response.set_cookie("email", email)
-
-        return response
+        return redirect(url_for("login"))
 
     return render_template("register.html")
 
 
+# Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
 
-        email = request.form.get("email")
-        password = request.form.get("password")
-
-   
         if not email or not password:
+            flash("Please fill in all fields.", "error")
+            return redirect(url_for("login"))
 
-            return render_template(
-                "login.html",
-                error="Please fill in all fields"
+        with get_db() as db:
+            user = db.execute(
+                """
+                SELECT id, email FROM users
+                WHERE email = ? AND password = ?
+                """,
+                (email, password)
+            ).fetchone()
+
+        if user:
+            response = make_response(
+                redirect(url_for("instagram"))
             )
+            response.set_cookie("email", email)
+            flash("Login successful!", "success")
+            return response
 
-        users = load_users()
-
-        
-        for user in users:
-
-            if user["email"] == email and user["password"] == password:
-
-                
-                response = make_response(
-                    redirect(url_for("profile"))
-                )
-
-                response.set_cookie("email", email)
-
-                return response
-
-       
-        return render_template(
-            "login.html",
-            error="Incorrect email or password"
-        )
+        flash("Incorrect email or password.", "error")
+        return redirect(url_for("login"))
 
     return render_template("login.html")
 
+
+# Logout
 @app.route("/logout")
 def logout():
-
-   
-    response = make_response(
-        redirect(url_for("login"))
-    )
-
+    response = make_response(redirect(url_for("login")))
     response.delete_cookie("email")
-
+    flash("You have successfully logged out.", "success")
     return response
 
 
